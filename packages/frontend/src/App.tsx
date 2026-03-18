@@ -9,6 +9,7 @@ import RewardPoint from "./pages/RewardPoint";
 import HistoryContent from "./pages/HistoryContent";
 import HistoryState from "./pages/HistoryState";
 import WorkoutTracking from "./pages/WorkoutTracking";
+import RewardAchievement from "./pages/RewardAchievement.tsx";
 
 function App() {
   return (
@@ -37,6 +38,10 @@ function App() {
         <Route index element={<RewardPoint />} />           {/* / */}
         <Route path="*" element={<div>404 Not Found</div>} />
       </Route>      
+       <Route path="/reward/achievement" element={<MainLayout />}>
+        <Route index element={<RewardAchievement />} />           {/* / */}
+        <Route path="*" element={<div>404 Not Found</div>} />
+      </Route>
       <Route path="/member/register" element={<MainLayout />}>
         <Route index element={<MemberRegister />} />           {/* / */}
         <Route path="*" element={<div>404 Not Found</div>} />

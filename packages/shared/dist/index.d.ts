@@ -19,6 +19,18 @@ export interface ColDesc {
     summary?: string;
     aggregate?: number;
 }
+export interface Member {
+    id: string;
+    name: string;
+    img: string;
+    sex: string;
+    age: number;
+    point: number;
+    exp_point: number;
+    lvl: number;
+    membership: string;
+    membership_name: string;
+}
 export interface WorkoutRecord {
     id: string;
     workout_id: string;
@@ -32,6 +44,17 @@ export interface WorkoutRecord {
     count_s: number;
     point: number;
     description?: string;
+}
+export interface WorkoutHistory {
+    wo_dt: string;
+    status: string;
+}
+export interface WorkoutDetail {
+    title: string;
+    guide: string;
+    img: string;
+    target_reps: number;
+    target_sets: number;
 }
 export interface MenuPosSibling {
     id: string;
