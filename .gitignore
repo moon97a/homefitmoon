@@ -1,0 +1,6 @@
+# node packages
+node_modules/
+# logs 파일 무시
+logs/
+# 환경 변수 파일 무시
+**/.env*

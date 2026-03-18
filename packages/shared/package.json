@@ -1,0 +1,25 @@
+{
+ "//": [
+  "1. npm 프로젝트 관리 파일이다.",
+  "2. tsc: typescript compiler",
+  "3. "
+ ],
+ "name": "shared",
+ "version": "1.0.0",
+ "author": "bbg",
+ "license": "ISC",
+ "description": "프런트앤드와 백앤드에서 동시에 사용하는 모듈과 type을 정의한다. typescript로 작성된 모듈을 컴파일한다.",
+ "private": true,
+ "type": "module",
+ "main": "dist/index.js",
+ "types": "dist/index.d.ts",
+ "scripts": {
+  "build": "tsc",
+  "type-check": "tsc --noEmit"
+ },
+ "devDependencies": {
+  "@types/node": "^25.2.0",
+  "typescript": "^5.9.3"
+ },
+ "keywords": []
+}

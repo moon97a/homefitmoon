@@ -1,0 +1,22 @@
+{
+  "//": [
+    "1. typescript 설정파일이다.",      
+    "2. target : javascript 버전",
+    "3. module : CommonJS - require(), module.exports, ESNext - import, export",
+    "4. commposite : 참조되는 프로젝트(여기서는 shared)**에 반드시 필요합니다",    
+    "VSCode: TypeScript 서버 재시작 필수"
+  ],    
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "composite": true,  
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src/**/*"]
+}

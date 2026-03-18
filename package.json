@@ -1,0 +1,21 @@
+{
+ "//": [
+    "1. npm 프로젝트 관리 파일이다.",
+    "2. private: 개인 프로젝트를 공개 레지스트리에 업로드하는 것을 방지합니다",
+    "3. type : commonjs - CommonJS(require/module.exports) vs module - ESM(import/export) 를 결정합니다",
+    "4. "
+  ],  
+  "name": "monorepo_npm",
+  "version": "1.0.0",
+  "author": "bbg",
+  "license": "ISC",
+  "description": "npm 이용하여 frontend, backend, shared repo들을 만든다.",
+  "private": true,  
+  "type": "module",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "dev": "npm run dev -w frontend & npm run dev -w backend",
+    "type-check": "npm run type-check -w frontend && npm run type-check -w backend && npm run type-check -w shared",
+    "build": "npm run build -w frontend && npm run build -w backend && npm run build -w shared"
+  }
+}

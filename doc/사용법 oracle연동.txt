@@ -1,0 +1,21 @@
+#1. oracle은 12버전 이상 버전을 설치하자
+-- Thin 모드라 별도의 Oracle Client 없이도 접속 가능합니다 
+
+#2. oracle package 설치
+npm install oracledb
+
+
+# 2. 새 프로젝트
+mkdir shardcn && cd shardcn
+code .
+
+# 3. 이제 git init → 자동 main 브랜치!
+git init  # main 브랜치 생성됨
+git config user.name "byeonggubaek"
+git config user.email "oranjes@naver.com"
+
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/byeonggubaek/shardcn.git
+git push -u origin main
+

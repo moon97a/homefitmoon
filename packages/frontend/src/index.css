@@ -1,0 +1,150 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* v4 다크모드 필수 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --radius: 0.5rem;
+  --background: oklch(1 0 180);
+  --foreground: oklch(0.143 0.016 199.058);
+  --muted: oklch(0.907 0.01 200.754);
+  --muted-foreground: oklch(0.434 0.01 200.629);
+  --popover: oklch(0.992 0 161.565);
+  --popover-foreground: oklch(0.124 0.013 198.762);
+  --card: oklch(0.992 0 161.565);
+  --card-foreground: oklch(0.124 0.013 198.762);
+  --border: oklch(0.949 0.003 200.847);
+  --input: oklch(0.949 0.003 200.847);
+  --primary: oklch(0.548 0.036 200.206);
+  --primary-foreground: oklch(1 0 180);
+  --secondary: oklch(0.927 0.005 200.821);
+  --secondary-foreground: oklch(0.431 0.018 200.418);
+  --accent: oklch(0.864 0.017 200.657);
+  --accent-foreground: oklch(0.348 0.022 200.226);
+  --destructive: oklch(0.586 0.166 43.777);
+  --destructive-foreground: oklch(1 0 180);
+  --ring: oklch(0.548 0.036 200.206);
+  --chart-1: oklch(0.548 0.036 200.206);
+  --chart-2: oklch(0.927 0.005 200.821);
+  --chart-3: oklch(0.864 0.017 200.657);
+  --chart-4: oklch(0.949 0.004 200.842);
+  --chart-5: oklch(0.554 0.042 200.133);
+  --focus: oklch(0.685 0.169 237.323);     /* bg-sky-500 */
+  --focus-foreground: oklch(1 0 180);     /* 흰색 (변경없음) */
+  --warning: oklch(0.58 0.25 25);            /* bg-rose-500 */
+  --warning-foreground: oklch(1 0 180);      /* 흰색 (변경없음) */    
+  --table-1: oklch(0.807 0.1 283.926);
+  --table-2: oklch(0.878 0.062 248.54);
+  --table-3: oklch(0.837 0.105 307.059);
+  --table-4: oklch(0.904 0.049 248.366);
+  --table-5: oklch(0.805 0.103 283.834);  
+  --condition: oklch(0.949 0.004 200.842);  
+  --control: oklch(1 0 0);  
+  --unreached: var(--primary);
+}
+
+.dark {
+  --radius: 0.5rem;
+  --background: oklch(0.122 0.011 199.149);
+  --foreground: oklch(0.979 0.003 200.847);
+  --muted: oklch(0.258 0.013 200.331);
+  --muted-foreground: oklch(0.763 0.008 200.755);
+  --popover: oklch(0.14 0.012 199.3);
+  --popover-foreground: oklch(0.986 0.002 200.861);
+  --card: oklch(0.14 0.012 199.3);
+  --card-foreground: oklch(0.986 0.002 200.861);
+  --border: oklch(0.276 0.009 200.506);
+  --input: oklch(0.276 0.009 200.506);
+  --primary: oklch(0.548 0.036 200.206);
+  --primary-foreground: oklch(1 0 180);
+  --secondary: oklch(0.229 0.004 200.68);
+  --secondary-foreground: oklch(0.778 0.008 200.767);
+  --accent: oklch(0.31 0.013 200.419);
+  --accent-foreground: oklch(0.838 0.013 200.706);
+  --destructive: oklch(0.702 0.169 47.122);
+  --destructive-foreground: oklch(0 0 0);
+  --ring: oklch(0.548 0.036 200.206);
+  --chart-1: oklch(0.548 0.036 200.206);
+  --chart-2: oklch(0.229 0.004 200.68);
+  --chart-3: oklch(0.31 0.013 200.419);
+  --chart-4: oklch(0.262 0.005 200.666);
+  --chart-5: oklch(0.554 0.042 200.133);
+  --focus: oklch(0.685 0.169 237.323);     /* bg-sky-500 */
+  --focus-foreground: oklch(1 0 180);     /* 흰색 (변경없음) */
+  --warning: oklch(0.58 0.25 25);            /* bg-rose-500 */
+  --warning-foreground: oklch(1 0 180);      /* 흰색 (변경없음) */      
+  --table-1: oklch(0.807 0.1 283.926);
+  --table-2: oklch(0.878 0.062 248.54);
+  --table-3: oklch(0.837 0.105 307.059);
+  --table-4: oklch(0.904 0.049 248.366);
+  --table-5: oklch(0.805 0.103 283.834); 
+  --condition: oklch(0.262 0.005 200.666);  
+  --control: oklch(1 0 0);    
+  --unreached: var(--primary);  
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-focus: var(--focus);
+  --color-focus-foreground: var(--focus-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-table-1: var(--table-1);
+  --color-table-2: var(--table-2);  
+  --color-table-3: var(--table-3);
+  --color-table-4: var(--table-4);
+  --color-table-5: var(--table-5);
+  --color-condition: var(--condition);
+  --color-control: var(--control);  
+  --color-unreached: var(--unreached);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    @apply bg-background text-foreground;
+  }
+}

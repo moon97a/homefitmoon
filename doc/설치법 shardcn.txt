@@ -1,0 +1,79 @@
+#1. tailwincss v4 설치 
+npm install -D tailwindcss @tailwindcss/vite
+
+#2. Vite 설정 - vite.config.ts
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+})
+
+#3. CSS 적용 - src/index.css
+@import "tailwindcss";
+
+#4. tsconfig.json과 tsconfig.app.json에 경로 alias를 추가
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+
+#5. vite.config.ts에도 path resolver 추가:
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+})
+
+#6. Tailwind CSS IntelliSense 설치 
+언어 모드 변경: CSS 파일 열기 → 오른쪽 하단 언어 표시(Tailwind CSS) 클릭 → "Tailwind CSS" 선택.
+
+#7. shadcn 설치 
+npx shadcn@latest init
+
+#8. 기본 components 설치 
+npx shadcn@latest add button
+npx shadcn@latest add card
+npx shadcn@latest add table 
+
+#9. App.tsx 
+import { useEffect, useState } from 'react'
+import { greet, type ApiResponse } from 'shared'
+import { Button } from "@/components/ui/button"
+
+function App() {
+  const [data, setData] = useState<ApiResponse<string> | null>(null)
+
+  useEffect(() => {
+    fetch('http://localhost:3001/')
+      .then(res => res.json())
+      .then(setData)
+  }, [])
+
+  return (
+    <div className="gap-4 p-8 max-w-4xl mx-auto">
+      <div className="flex justify-center">
+        <Button className="!text-black !bg-gray-200 hover:!bg-blue-600 hover:!text-white" variant="default">Shard Button</Button> 
+      </div>
+      <h1 className="text-3xl font-bold mb-8">{greet('ESM Frontend')}</h1>
+      <pre className="bg-gray-100 p-4 rounded overflow-auto">
+        {JSON.stringify(data, null, 2)}
+      </pre>
+    </div>
+  )
+}
+
+export default App

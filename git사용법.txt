@@ -1,0 +1,36 @@
+# 1. 기본 브랜치 main으로 설정 (git init 전)
+git config --global init.defaultBranch main
+
+# 2. 새 프로젝트
+mkdir shardcn && cd shardcn
+code .
+
+# 3. 이제 git init → 자동 main 브랜치!
+git init  # main 브랜치 생성됨
+git config user.name "byeonggubaek"
+git config user.email "oranjes@naver.com"
+
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/byeonggubaek/homefit.git
+git push -u origin main
+
+#4. branch 처리 
+git branch -a 
+git branch <브랜치명>
+git switch <브랜치명>
+git add . 
+git commit -m 'Branch Commit'
+git push -u origin <브랜치명>
+
+#5. branch 삭제 
+git branch -d <브랜치명> 
+git push origin --delete <브랜치명>
+
+#6. git merge 
+git switch main 
+git pull 
+git merge <브랜치명>
+
+
+

@@ -1,0 +1,36 @@
+{
+ "//": [
+  "1. npm 프로젝트 관리 파일이다.",
+  "2. "
+ ],
+ "name": "backend",
+ "version": "1.0.0",
+ "author": "bbg",
+ "license": "ISC",
+ "description": "백앤드로 작동하고 node.js 플로젝트이다.",
+ "private": true,
+ "type": "module",
+ "main": "dist/index.js",
+ "scripts": {
+  "dev": "tsx watch src/index.ts",
+  "build": "tsc",
+  "type-check": "tsc --noEmit",
+  "start": "node dist/index.js"
+ },
+ "keywords": [],
+ "dependencies": {
+  "cors": "^2.8.6",
+  "dotenv": "^17.2.4",
+  "express": "^5.2.1",
+  "oracledb": "^6.10.0"
+ },
+ "devDependencies": {
+  "@types/cors": "^2.8.19",
+  "@types/express": "^5.0.6",
+  "@types/node": "^25.2.1",
+  "@types/oracledb": "^6.10.1",
+  "shared": "^1.0.0",
+  "tsx": "^4.21.0",
+  "typescript": "^5.9.3"
+ }
+}

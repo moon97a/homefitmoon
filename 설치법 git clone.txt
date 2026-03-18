@@ -1,0 +1,45 @@
+#1. remote 레포지토리 local로 복사
+git clone -b init --single-branch https://github.com/byeonggubaek/shardcn.git 당신의_새로운_레포지토리
+
+#2. 새로 생성된 레포지토리의 기존 레포지토리와의 관계를 단절한다. 
+cd 당신의_새로운_레포지토리
+# 폴더 삭제
+rm .git
+# visual code 실행 & 당신의_새로운_레포지토리폴더 열기 & 새 터미널 실행 
+
+#3. package install & 공통 모듈 빌드 & 백앤드와 프런트앤드 기동 테스트 
+# 프로젝트에서 사용하는 package들을 설치한다. 
+npm install
+# shared 폴더로 이동  
+cd packages/shared
+npm run build 
+# backend 실행 
+cd ../..
+cd packages/backend
+npm run dev 
+# 터미널 분리 & frontend 실행 
+cd packages/frontend
+npm run dev 
+
+# 결과가 아래와 같이 나오면 성공 
+ello ESM Frontend!
+{
+    "success": true,
+    "data": "Hello Backend ESM!!"
+}
+
+#4. github에서 새로운 레포지토리 생성 
+github에서 당신의_새로운_레포지토리를 생성 
+
+#5. 당신의 로컬 레포지토리 생성하고 원격 레포지토리와 일치시킴 
+# 루트로 이동  
+cd ../.. 
+git init 
+git config user.name "홍길동"
+git config user.email "dev@example.com"
+git add .
+git commit -m "Initial commit" 
+git remote add origin https://github.com/당신의이름/당신의_새로운_레포지토리.git
+git push -u origin main
+
+#6. 이제 새로운 로직을 추가한다. 
