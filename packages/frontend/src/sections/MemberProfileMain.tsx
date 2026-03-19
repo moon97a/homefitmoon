@@ -1,40 +1,16 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+import { da } from "date-fns/locale"
 
-const MemberProfileMain = () => {
+
+const MemberProfileMain = ({ data }: { data: string }) => {
   return (
-    <Accordion
-      type="single"
-      collapsible
-      defaultValue="shipping"
-      className="max-w-lg"
-    >
-      <AccordionItem value="shipping">
-        <AccordionTrigger>What are your shipping options?</AccordionTrigger>
-        <AccordionContent>
-          We offer standard (5-7 days), express (2-3 days), and overnight
-          shipping. Free shipping on international orders.
-        </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="returns">
-        <AccordionTrigger>What is your return policy?</AccordionTrigger>
-        <AccordionContent>
-          Returns accepted within 30 days. Items must be unused and in original
-          packaging. Refunds processed within 5-7 business days.
-        </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="support">
-        <AccordionTrigger>How can I contact customer support?</AccordionTrigger>
-        <AccordionContent>
-          Reach us via email, live chat, or phone. We respond within 24 hours
-          during business days.
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <div className="flex flex-col gap-4 h-full">
+      {/* 1번 div 시작 */}
+      <div className="h-2/5 border-2 rounded-lg">{data}</div>
+      {/* 2번 div 시작 */}
+      <div className="h-1/5 border-2 rounded-lg">section 2</div>
+      {/* 3번 div 시작 */}
+      <div className="h-2/5 border-2 rounded-lg">section 3</div>
+    </div>
   )
 }
 
