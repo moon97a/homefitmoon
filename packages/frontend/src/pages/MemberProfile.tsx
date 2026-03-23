@@ -27,7 +27,7 @@ export default function MemberProfile() {
   };
 
   return (
-    <div className="profileArea p-8">
+    <div className="flex flex-col gap-3">
       <div className="flex gap-4 mb-6">
         <WdogBreadClum page="MemberProfile" />
       </div>

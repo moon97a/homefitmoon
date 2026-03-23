@@ -201,6 +201,11 @@ DROP TABLE MEMBER;
 DROP TABLE WORKOUT;
 DROP TABLE ACHIEVEMENT;
 DROP TABLE REWARD;
+
+DROP TABLE MEMBERSHIP_DETAIL;
+DROP TABLE MEMBERSHIP_FUNC;
+DROP TABLE MEMBERSHIP;
+
 REM ===============================================================================================================
 REM = 회원 
 REM ===============================================================================================================
@@ -208,6 +213,9 @@ CREATE TABLE MEMBER
 (
     ID VARCHAR2(7) NOT NULL,
 	NAME NVARCHAR2(14) NOT NULL,
+    NICKNAME NVARCHAR2(10) NOT NULL,
+    E_MAIL NVARCHAR2(50) NOT NULL,
+    P_NUMBER VARCHAR2(15) NOT NULL,  
     IMG NVARCHAR2(256) NOT NULL,
 	SEX NVARCHAR2(3) NOT NULL,
     AGE NUMBER(3) NOT NULL, 
@@ -220,23 +228,125 @@ CREATE TABLE MEMBER
 
 INSERT INTO MEMBER VALUES
 (
-    'U000001', '백병구', '/member/U000001.jpg','남', 52, 0, 0, 1, 'V'
+    'U000001', '백병구','쥐','A@NAVER.COM','010-1111-1111', '/member/U000001.jpg','남', 52, 0, 0, 1, 'MS00003'
 );
 INSERT INTO MEMBER VALUES
 (
-    'U000002', '문정인', '/member/u000002.jpg','여', 24, 0, 0, 1, 'F'  
+    'U000002', '문정인','문어','A@NAVER.COM','010-1111-1111', '/member/u000002.jpg','여', 24, 0, 0, 1, 'MS00001'  
 );
 INSERT INTO MEMBER VALUES
 (
-    'U000003', '문성윤', '/member/u000003.jpg','남', 40, 0, 0, 1, 'N' 
+    'U000003', '문성윤','호랑이','A@NAVER.COM','010-1111-1111', '/member/u000003.jpg','남', 40, 0, 0, 1, 'MS00001' 
 );
 INSERT INTO MEMBER VALUES
 (
-    'U000004', '김동건', '/member/u000004.jpg','남', 26, 0, 0, 1, 'N'
+    'U000004', '김동건','소','A@NAVER.COM','010-1111-1111', '/member/u000004.jpg','남', 26, 0, 0, 1, 'MS00002'
 );
 
 SELECT *
 FROM   MEMBER;
+
+REM ===============================================================================================================
+REM = 멤버쉽 
+REM ===============================================================================================================
+CREATE TABLE MEMBERSHIP
+(
+    ID VARCHAR2(7) NOT NULL,
+	NAME NVARCHAR2(14) NOT NULL,
+    FEE NUMBER(10) DEFAULT 0,
+    CONSTRAINT MEMBERSHIP_PK PRIMARY KEY (ID)  -- 
+);
+
+INSERT INTO MEMBERSHIP VALUES
+(
+    'MS00001', 'FREE',0
+);
+INSERT INTO MEMBERSHIP VALUES
+(
+    'MS00002', 'PREMIUM',9900
+);
+INSERT INTO MEMBERSHIP VALUES
+(
+    'MS00003', 'VIP',13900
+);
+
+SELECT *
+FROM   MEMBERSHIP;
+
+REM ===============================================================================================================
+REM = 기능
+REM ===============================================================================================================
+CREATE TABLE MEMBERSHIP_FUNC
+(
+    ID VARCHAR2(7) NOT NULL,
+    NAME NVARCHAR2(7) NOT NULL,
+    CONSTRAINT MEMBERSHIP_FUNC_PK PRIMARY KEY (ID)
+);
+
+INSERT INTO MEMBERSHIP_FUNC VALUES
+(
+    'MF00001','광고 제거'
+);
+INSERT INTO MEMBERSHIP_FUNC VALUES
+(
+    'MF00002', '1대1식단관리'
+);
+INSERT INTO MEMBERSHIP_FUNC VALUES
+(
+    'MF00003', '실시간자세교정'
+);
+INSERT INTO MEMBERSHIP_FUNC VALUES
+(
+    'MF00004', '오프라인매칭'
+);
+
+SELECT *
+FROM   MEMBERSHIP_FUNC;
+
+REM ===============================================================================================================
+REM = 멤버쉽상세
+REM ===============================================================================================================
+CREATE TABLE MEMBERSHIP_DETAIL
+(
+    MS_ID VARCHAR2(7) NOT NULL,
+	FUNC_ID VARCHAR2(7) NOT NULL,
+    CONSTRAINT MEMBERSHIP_DETAIL_PK PRIMARY KEY (MS_ID, FUNC_ID),
+    CONSTRAINT MEMBERSHIP_MS_ID_FK FOREIGN KEY (MS_ID) REFERENCES MEMBERSHIP(ID),
+    CONSTRAINT MEMBERSHIP_FUNC_FUNC_ID_FK FOREIGN KEY (FUNC_ID) REFERENCES MEMBERSHIP_FUNC(ID)
+);
+
+INSERT INTO MEMBERSHIP_DETAIL VALUES
+(
+    'MS00001', 'MF00002'
+);
+INSERT INTO MEMBERSHIP_DETAIL VALUES
+(
+    'MS00001', 'MF00003'
+);
+INSERT INTO MEMBERSHIP_DETAIL VALUES
+(
+    'MS00002', 'MF00001'
+);
+INSERT INTO MEMBERSHIP_DETAIL VALUES
+(
+     'MS00002', 'MF00002'
+);
+INSERT INTO MEMBERSHIP_DETAIL VALUES
+(
+     'MS00002', 'MF00003'
+);
+INSERT INTO MEMBERSHIP_DETAIL VALUES
+(
+     'MS00002', 'MF00004'
+);
+
+
+
+SELECT *
+FROM   MEMBERSHIP_DETAIL;
+
+
+
 
 REM ===============================================================================================================
 REM = 운동
