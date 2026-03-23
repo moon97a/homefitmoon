@@ -1,6 +1,4 @@
 import logo from "../../public/logo.svg";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Trash2Icon } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface MemberProfilePremiumProps {
@@ -101,8 +99,6 @@ const MemberProfilePremium = ({ userData }: MemberProfilePremiumProps) => {
                         })}
                 </div>
             </div>
-
-            {/* 결제 수단 및 해지 로직 생략 (기본 구조 유지됨) */}
         </div>
     );
 };

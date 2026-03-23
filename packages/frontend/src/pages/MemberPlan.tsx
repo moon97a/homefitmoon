@@ -1,12 +1,13 @@
 // [ 임포트 시작 ]
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
+import {
   X, Plus, Flame, Dumbbell, Timer, Star,
   Target, Heart, Zap, Footprints, Trash2, HelpCircle, RotateCcw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import WdogBreadClum from "@/components/WdogBreadClum";
 // [ 임포트 끝 ]
+
 
 // [ 타입 및 상수 시작 ]
 type Tab = '일일 목표' | '주간 목표';
@@ -36,6 +37,8 @@ const iconOptions = [
   { name: 'Zap', icon: Zap, color: 'bg-yellow-500' },
 ];
 
+
+
 const REQUIRED_XP = 1000;
 const ACHIEVEMENT_XP = 200;
 const LEVEL_TITLES = ['홈트 초보자', '홈트 입문자', '홈트 중급자', '홈트 상급자', '홈트 고수'];
@@ -46,7 +49,7 @@ const MEMBER_ID = 'U000002';
 const CharacterAvatar = ({ level }: { level: number }) => (
   <div className="relative">
     <div className="w-24 h-24 bg-[#818CF8] rounded-full flex items-center justify-center text-white shadow-lg">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
     </div>
     <div className="absolute bottom-0 right-0 bg-[#F59E0B] text-white text-xs font-bold w-7 h-7 rounded-full border-4 border-white flex items-center justify-center shadow">{level}</div>
   </div>
@@ -76,7 +79,8 @@ export default function MemberPlan() {
   const [currentXP, setCurrentXP] = useState(0);
   const [level, setLevel] = useState(0);
   const [memberName, setMemberName] = useState('');
-
+  const [nickname, setNickname] = useState('');
+  const [profileImg, setProfileImg] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('일일 목표');
   const [modalTitle, setModalTitle] = useState('');
@@ -90,14 +94,26 @@ export default function MemberPlan() {
     try {
       const memberRes = await fetch(`http://localhost:3001/api/get_member?memberId=${MEMBER_ID}`);
       const memberResult = await memberRes.json();
+      
       if (memberResult.success) {
         const m = memberResult.data;
+        
+        // 1. 레벨, 경험치, 스트릭 설정
         setLevel(Number(m.LVL ?? m.lvl ?? 0));
         setCurrentXP(Number(m.EXP_POINT ?? m.exp_point ?? 0));
         setStreak(Number(m.STREAK ?? m.streak ?? 0));
         setMemberName(m.NAME ?? m.name ?? '');
+
+        // 2. 닉네임 설정 (우선순위: NICKNAME -> NAME -> '회원')
+        const finalNickname = m.NICKNAME || m.nickname || m.NAME || m.name || '회원';
+        setNickname(finalNickname);
+
+        // 3. 프로필 이미지 설정 (서버 주소와 합치기)
+        const rawImg = m.IMG || m.img || m.PROFILE_IMG || m.profile_img || '/member/U000002.jpg';
+        setProfileImg(`http://localhost:5173${rawImg}`); 
       }
 
+      // 목표 데이터 로드 (기존과 동일)
       const goalsRes = await fetch(`http://localhost:3001/api/get_member_goals?memberId=${MEMBER_ID}`);
       const goalsResult = await goalsRes.json();
       if (goalsResult.success) {
@@ -117,7 +133,6 @@ export default function MemberPlan() {
       }
     } catch (err) { console.error("데이터 로드 실패:", err); }
   }, []);
-
   useEffect(() => {
     loadInitialData();
   }, [loadInitialData]);
@@ -149,7 +164,7 @@ export default function MemberPlan() {
       target_val: Number(modalTarget),
       unit: modalUnit,
       is_representative: goals.length === 0 ? 'Y' : 'N',
-      goal_type: activeTab 
+      goal_type: activeTab
     };
     try {
       const res = await fetch('http://localhost:3001/api/add_member_goal', {
@@ -160,7 +175,7 @@ export default function MemberPlan() {
       if (res.ok) {
         setIsModalOpen(false);
         setModalTitle('');
-        await loadInitialData(); 
+        await loadInitialData();
       }
     } catch (err) { console.error(err); }
   };
@@ -183,26 +198,27 @@ export default function MemberPlan() {
           if (newExp >= REQUIRED_XP) {
             newLvl += 1;
             newExp -= REQUIRED_XP;
-            alert(`🎊 레벨업 축하합니다! [${LEVEL_TITLES[newLvl] || '홈트 고수'}] 등급이 되었습니다!`);
+            alert(`🎊 레벨업 축하합니다! [${LEVEL_TITLES[newLvl]}] 등급이 되었습니다!`);
           }
 
           setXpGainNotify(true);
           setTimeout(() => setXpGainNotify(false), 2000);
-          
+
           await fetch('http://localhost:3001/api/update_member_stats', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ memberId: MEMBER_ID, lvl: newLvl, expPoint: newExp })
           });
         }
-        await loadInitialData(); 
+        await loadInitialData();
       }
     } catch (err) { console.error(err); }
   };
 
+  
   const handleNextDay = async () => {
     const repGoal = goals.find(g => g.isRepresentative);
-    
+
     // 대표 목표가 없으면 스트릭을 계산할 수 없음
     if (!repGoal) {
       return alert("⚠️ 별표(⭐)를 눌러 대표 목표를 먼저 설정해주세요!");
@@ -223,7 +239,7 @@ export default function MemberPlan() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ memberId: MEMBER_ID, streakIncr: nextStreak })
       });
-      if (res.ok) await loadInitialData(); 
+      if (res.ok) await loadInitialData();
     } catch (err) { console.error(err); }
   };
 
@@ -246,7 +262,7 @@ export default function MemberPlan() {
       </div>
       {/* 상단 네비게이션 및 시뮬레이션 버튼 */}
       <div className="px-6 pt-4 flex justify-between items-center">
-        
+
         <button onClick={handleNextDay} className="flex items-center gap-2 text-xs font-bold text-slate-400 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm hover:text-indigo-600 transition-colors">
           <RotateCcw size={14} /> 다음 날 시뮬레이션
         </button>
@@ -254,19 +270,26 @@ export default function MemberPlan() {
 
       {/* 헤더 섹션 */}
       <header className="flex flex-col items-center pt-8 pb-4">
-        <CharacterAvatar level={level} />
+        {profileImg ? (
+          <div className="relative">
+            <img src={profileImg} alt="프로필" className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover" />
+            <div className="absolute bottom-0 right-0 bg-[#F59E0B] text-white text-xs font-bold w-7 h-7 rounded-full border-4 border-white flex items-center justify-center shadow">{level}</div>
+          </div>
+        ) : (
+          <CharacterAvatar level={level} />
+        )}
         <h1 className="text-3xl font-black mt-4 text-slate-900 leading-none">운동 목표</h1>
-        <p className="text-slate-400 font-medium mt-1">님, 오늘도 힘내세요!</p>
+        <p className="text-slate-400 font-medium mt-1">{nickname}님, 오늘도 힘내세요!</p>
       </header>
 
       {/* 상태 대시보드 (XP 및 스트릭) */}
       <div className="max-w-6xl mx-auto w-full px-6 grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-6">
         <div className="md:col-span-2">
-          <XPBar 
-            currentXP={currentXP} 
-            requiredXP={REQUIRED_XP} 
-            currentLevel={`${LEVEL_TITLES[level] || '홈트 고수'} (Lv.${level})`} 
-            nextLevel={`${LEVEL_TITLES[level + 1] || '만렙 달성'} (Lv.${level+1})`} 
+          <XPBar
+            currentXP={currentXP}
+            requiredXP={REQUIRED_XP}
+            currentLevel={`${LEVEL_TITLES[level] || '홈트 고수'} (Lv.${level})`}
+            nextLevel={`${LEVEL_TITLES[level + 1] || '만렙 달성'} (Lv.${level + 1})`}
           />
         </div>
         <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow">
