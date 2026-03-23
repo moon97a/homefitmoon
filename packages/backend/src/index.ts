@@ -3,7 +3,10 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { 
   closePool, getMenus, getWorkoutDetail, getCurMenuPos, 
-  getWorkoutHistory, getMember 
+  getWorkoutHistory, getMember, getMemberGoals, addMemberGoal, deleteMemberGoal, updateGoalProgress,
+  updateMemberStats, execute,
+  setRepresentativeGoal,
+  getAllMemberships
 } from './db.js';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -63,6 +66,54 @@ app.post('/api/recommend-exercise', async (req, res) => {
 });
 
 // ==========================================
+// 🎯 운동 목표(Member Goals) API
+// ==========================================
+
+// 1. 목표 리스트 조회 (회원 ID 기준)
+app.get('/api/get_member_goals', async (req, res) => { 
+  try { 
+    const { memberId } = req.query as { memberId: string }; 
+    const data = await getMemberGoals(memberId); 
+    res.json({ success: true, data }); 
+  } catch (err) { 
+    res.status(500).json({ success: false, error: err }); 
+  } 
+});
+
+// 2. 새로운 목표 추가
+app.post('/api/add_member_goal', async (req, res) => { 
+  try { 
+    // 리액트에서 보낸 목표 데이터를 받아서 DB에 저장
+    const result = await addMemberGoal(req.body); 
+    res.json({ success: true, result }); 
+  } catch (err) { 
+    res.status(500).json({ success: false, error: err }); 
+  } 
+});
+
+// 3. 목표 삭제
+app.delete('/api/delete_member_goal', async (req, res) => { 
+  try { 
+    const { goalId } = req.query as { goalId: string }; 
+    const result = await deleteMemberGoal(Number(goalId)); 
+    res.json({ success: true, result }); 
+  } catch (err) { 
+    res.status(500).json({ success: false, error: err }); 
+  } 
+});
+
+// 4. 목표 진행도 업데이트 (경험치 로직 포함 가능)
+app.post('/api/update_goal_progress', async (req, res) => { 
+  try { 
+    const { goalId, memberId, currentVal } = req.body; 
+    const result = await updateGoalProgress(goalId, memberId, currentVal); 
+    res.json({ success: true, result }); 
+  } catch (err) { 
+    res.status(500).json({ success: false, error: err }); 
+  } 
+});
+
+// ==========================================
 // 🛠️ 기본 데이터 API들 (기존 기능 유지)
 // ==========================================
 app.get('/api/get_menus', async (req, res) => { try { const data = await getMenus(); res.json({ success: true, data }); } catch (err) { res.status(500).json({ success: false, error: err }); } });
@@ -72,3 +123,62 @@ app.get('/api/get_member', async (req, res) => { try { const { memberId } = req.
 
 const server = app.listen(PORT, () => console.log(`✅ 백엔드 가동 중: http://localhost:${PORT}`));
 process.on('SIGINT', async () => { await closePool(); server.close(() => process.exit(0)); });
+
+// index.ts 에 추가
+app.get('/api/get_menu_pos', async (req, res) => { 
+  try { 
+    const { page } = req.query as { page: string }; 
+    const data = await getCurMenuPos(page); 
+    res.json({ success: true, data }); 
+  } catch (err) { 
+    res.status(500).json({ success: false, error: err }); 
+  } 
+});
+
+// server/index.ts 에 추가
+app.post('/api/update_member_stats', async (req, res) => {
+  try {
+    const { memberId, lvl, expPoint } = req.body;
+    const result = await updateMemberStats(memberId, lvl, expPoint);
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err });
+  }
+});
+
+// index.ts 에 추가
+app.post('/api/simulate_next_day', async (req, res) => {
+  try {
+    const { memberId, streakIncr } = req.body;
+    
+    // 1. 모든 목표의 진행도를 0으로 리셋 (DB 업데이트)
+    await execute(`UPDATE MEMBER_GOAL SET CURRENT_VAL = 0, IS_ACHIEVED_TODAY = 'N' WHERE MEMBER_ID = :1`, [memberId]);
+    
+    // 2. 스트릭 업데이트 (성공 시 +1, 실패 시 0 등 리액트에서 결정한 값으로)
+    await execute(`UPDATE MEMBER SET STREAK = :1 WHERE ID = :2`, [streakIncr, memberId]);
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err });
+  }
+});
+
+// [index.ts 추가 로직] 대표 목표 설정 API
+app.post('/api/set_representative_goal', async (req, res) => {
+  try {
+    const { memberId, goalId } = req.body;
+    const result = await setRepresentativeGoal(memberId, goalId);
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err });
+  }
+});
+
+app.get('/api/get_all_memberships', async (req, res) => {
+  try {
+    const data = await getAllMemberships();
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err });
+  }
+});

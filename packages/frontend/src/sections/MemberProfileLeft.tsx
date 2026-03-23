@@ -11,14 +11,13 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "../components/ui/alert-dialog"
-import { Button } from "../components/ui/button"
 import { Trash2Icon } from "lucide-react"
 
 
 
 
 
-const MemberProfileLeft = ({ onChildData }: { onChildData: (data: string) => void }) => {
+const MemberProfileLeft = ({ userData, onChildData }: { userData: any, onChildData: (data: string) => void }) => {
 
 
     return (
@@ -26,16 +25,19 @@ const MemberProfileLeft = ({ onChildData }: { onChildData: (data: string) => voi
             <div id='footheader' className="flex flex-col justify-center items-center py-8 gap-3">
                 {/* 1. flex-col(세로정렬)과 gap-3(이미지와 글자 사이 간격) 추가 */}
 
+
                 <img
-                    src="https://static.nid.naver.com/images/web/user/default.png"
+                    // 백엔드에서 온 '/member/u000002.jpg' 앞에 프론트엔드 주소(5173)를 강제로 붙입니다.
+                    src={`http://localhost:5173${userData?.img || "/member/u000002.jpg"}`}
                     width="100"
                     height="100"
                     alt="내 프로필 이미지"
                     className="rounded-full"
                 />
 
+
                 {/* 2. 이미지 바로 아래에 닉네임 추가 */}
-                <span className="font-bold text-lg text-[#333] mb-12">닉네임</span>
+                <span className="font-bold text-lg text-[#333] mb-12">{userData?.nickname || "회원님"}</span>
                 <div id='footbody'></div>
                 <div className="flex flex-col flex-1">
                     <div className="flex flex-col gap-10">

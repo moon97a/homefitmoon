@@ -25,9 +25,13 @@ export interface Member {
     img: string;
     sex: string;
     age: number;
+    nickname: string;
+    p_number: string;
+    e_mail: string;
     point: number;
     exp_point: number;
     lvl: number;
+    streak: number;
     membership: string;
     membership_name: string;
 }

@@ -4,7 +4,7 @@
 export interface NavSubItem {
   id: string,
   title: string;
-  href: string,  
+  href: string,
   description: string;
 }
 export interface NavItem {
@@ -29,16 +29,20 @@ export interface ColDesc {
   회원정보
 =======================================================================================================*/
 export interface Member {
-    id: string;
-    name: string;
-    img: string;
-    sex: string;
-    age: number;
-    point: number;
-    exp_point: number;   //
-    lvl: number;         //
-    membership : string;
-    membership_name: string;
+  id: string;
+  name: string;
+  img: string;
+  sex: string;
+  age: number;
+  nickname: string;
+  p_number: string;
+  e_mail: string;
+  point: number;
+  exp_point: number;   //
+  lvl: number;         //
+streak: number;      // 연속 출석 일수
+membership: string;
+membership_name: string;
 }
 /*=======================================================================================================
   홈 트레이닝 관련

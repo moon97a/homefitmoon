@@ -1,6 +1,6 @@
 // oracle-pool.ts (에러 수정 완료)
 import oracledb from 'oracledb';
-import { NavItem, NavSubItem, ColDesc, WorkoutRecord, ChartData, WorkoutRecordWithPlan, MenuPos, WorkoutHistory, Member, WorkoutDetail } from 'shared';
+import { NavItem, NavSubItem, ColDesc, WorkoutRecord, ChartData, MenuPos, WorkoutHistory, Member, WorkoutDetail } from 'shared';
 import dotenv from 'dotenv';
 import Logger from './logger.js'
 
@@ -112,7 +112,7 @@ async function execPlsql(sql: string, binds: Record<string, any>, options: any =
 /**
  * INSERT/UPDATE/DELETE (DML)
  */
-async function execute(sql: string, binds: any[] = []): Promise<any> {
+export async function execute(sql: string, binds: any[] = []): Promise<any> {
   let logEntry = null;
   let connection = null;  
   try {
@@ -310,9 +310,13 @@ SELECT
     A.img,
     A.sex,
     A.age,
+    A.nickname,
+    A.e_mail,
+    A.p_number,
     A.point,
     A.exp_point,
     A.lvl,
+    A.streak,
     A.membership,
     B.name membership_name
 FROM member A
@@ -444,16 +448,153 @@ export const getWorkoutDetail = async (workoutRecordId: string = ''): Promise<Wo
 // 10. 회원정보 조회
 export const getMember = async (memberId: string): Promise<Member> => {
   const record = await getRawMember(memberId);
+  
+  if (!record || record.length === 0) {
+    throw new Error("회원을 찾을 수 없습니다.");
+  }
+
+  const m = record[0]; 
+  const upperId = (m.ID || m.id || "").toUpperCase();
+  const fixedImgPath = `/member/${upperId}.jpg`;
+
   return {
-    id: record[0].ID,
-    name: record[0].NAME,
-    img: record[0].IMG,
-    sex: record[0].SEX,
-    age: record[0].AGE,
-    point: record[0].POINT,
-    exp_point: record[0].EXP_POINT,
-    lvl: record[0].LVL,
-    membership: record[0].MEMBERSHIP,
-    membership_name: record[0].MEMBERSHIP_NAME
+    img: fixedImgPath,
+    id: m.ID || m.id,
+    name: m.NAME || m.name,
+    nickname: m.NICKNAME || m.nickname, 
+    p_number: m.P_NUMBER || m.p_number,
+    e_mail: m.E_MAIL || m.e_mail,
+    sex: m.SEX || m.sex,
+    age: m.AGE || m.age,
+    point: m.POINT || m.point,
+    exp_point: m.EXP_POINT || m.exp_point || 0,
+    lvl: m.LVL || m.lvl || 0,
+    streak: m.STREAK || m.streak || 0, 
+    membership: m.MEMBERSHIP || m.membership,
+    membership_name: m.MEMBERSHIP_NAME || m.membership_name
   };
+};
+// --- [추가] 운동 목표 관련 인터페이스 (shared에 정의되어 있지 않다면 여기에 정의) ---
+export interface MemberGoal {
+  id: number;
+  member_id: string;
+  title: string;
+  icon_name: string;
+  icon_color: string;
+  target_val: number;
+  current_val: number;
+  streak: number;
+  unit: string;
+  is_representative: string; // 'Y' 또는 'N'
+  is_achieved_today: string; // 'Y' 또는 'N'
 }
+
+// --- [추가] DB 조회 및 명령 함수들 ---
+
+// 1. 특정 사용자의 모든 목표 조회
+export const getMemberGoals = async (memberId: string): Promise<MemberGoal[]> => {
+  const sql = `SELECT * FROM MEMBER_GOAL WHERE MEMBER_ID = :1 ORDER BY ID DESC`;
+  const records = await select(sql, [memberId]);
+  
+  return records.map((rec: any) => ({
+    id: rec.ID,
+    member_id: rec.MEMBER_ID,
+    title: rec.TITLE,
+    icon_name: rec.ICON_NAME,
+    icon_color: rec.ICON_COLOR,
+    target_val: rec.TARGET_VAL,
+    current_val: rec.CURRENT_VAL,
+    unit: rec.UNIT,
+    is_representative: rec.IS_REPRESENTATIVE,
+    is_achieved_today: rec.IS_ACHIEVED_TODAY,
+    goal_type: rec.GOAL_TYPE, // ★ 이 줄이 빠져있었습니다! 반드시 추가하세요.
+    streak: rec.STREAK // ★ 추가된 줄
+  }));
+};
+
+// 2. 새로운 목표 추가
+
+export const addMemberGoal = async (goal: any) => {
+  const sql = `
+    INSERT INTO MEMBER_GOAL (MEMBER_ID, TITLE, ICON_NAME, ICON_COLOR, TARGET_VAL, UNIT, IS_REPRESENTATIVE, GOAL_TYPE)
+    VALUES (:1, :2, :3, :4, :5, :6, :7, :8)
+  `;
+  
+  return await execute(sql, [
+    goal.member_id, 
+    goal.title, 
+    goal.icon_name, 
+    goal.icon_color, 
+    goal.target_val, 
+    goal.unit, 
+    goal.is_representative,
+    goal.goal_type // [추가] 리액트에서 보낸 '일일 목표' 또는 '주간 목표' 값
+  ]);
+};
+
+// 3. 목표 삭제
+export const deleteMemberGoal = async (goalId: number) => {
+  const sql = `DELETE FROM MEMBER_GOAL WHERE ID = :1`;
+  return await execute(sql, [goalId]);
+};
+
+// 4. 진행도 업데이트 및 경험치 지급 (PL/SQL 호출)
+// 이 함수는 단순히 숫자만 바꾸는 게 아니라, 달성 시 경험치를 올리는 로직을 포함할 수 있습니다.
+export const updateGoalProgress = async (goalId: number, memberId: string, newVal: number) => {
+  // 타겟 수치를 먼저 확인해서 달성 여부 판단
+  const goalRes = await select(`SELECT TARGET_VAL FROM MEMBER_GOAL WHERE ID = :1`, [goalId]);
+  const targetVal = goalRes[0]?.TARGET_VAL || 0;
+  const isAchieved = newVal >= targetVal ? 'Y' : 'N';
+
+  const sql = `UPDATE MEMBER_GOAL SET CURRENT_VAL = :1, IS_ACHIEVED_TODAY = :2 WHERE ID = :3`;
+  return await execute(sql, [newVal, isAchieved, goalId]);
+};
+  
+  // 여기서 목표 달성 여부를 체크하고 MEMBER 테이블의 EXP_POINT를 올리는 로직은 
+  // 나중에 DB 프로시저(USP)로 만들면 더 안전합니다. 우선은 기본 업데이트만 구현합니다.
+
+// server/db.ts 에 추가
+export const updateMemberStats = async (memberId: string, lvl: number, exp: number) => {
+  const sql = `
+    UPDATE MEMBER 
+    SET LVL = :1, EXP_POINT = :2 
+    WHERE ID = :3
+  `;
+  // execute 함수를 사용하여 데이터를 업데이트하고 autoCommit으로 확정합니다.
+  return await execute(sql, [lvl, exp, memberId]);
+};
+
+
+// [db.ts 추가 로직] 대표 목표 설정 (기존 꺼 다 N으로 밀고 선택한 것만 Y)
+export const setRepresentativeGoal = async (memberId: string, goalId: number) => {
+  // 1. 해당 사용자의 모든 목표를 'N'으로 초기화
+  await execute(`UPDATE MEMBER_GOAL SET IS_REPRESENTATIVE = 'N' WHERE MEMBER_ID = :1`, [memberId]);
+  // 2. 선택한 목표만 'Y'로 업데이트
+  const sql = `UPDATE MEMBER_GOAL SET IS_REPRESENTATIVE = 'Y' WHERE ID = :1`;
+  return await execute(sql, [goalId]);
+};
+
+// packages/backend/src/db.ts 에 추가
+export const getAllMemberships = async (): Promise<any[]> => {
+  // 1. 모든 멤버십 정보 조회
+  const memberships = await select(`SELECT id, name, fee FROM MEMBERSHIP ORDER BY fee`);
+  
+  // 2. 각 멤버십에 딸린 기능(Funcs)들을 조인해서 가져오기
+  const results = await Promise.all(memberships.map(async (ms) => {
+    const funcs = await select(`
+      SELECT b.id as func_id, b.name as func_name 
+      FROM MEMBERSHIP_DETAIL a
+      JOIN MEMBERSHIP_FUNC b ON a.func_id = b.id
+      WHERE a.ms_id = :1
+    `, [ms.ID]);
+    
+    return {
+      id: ms.ID,
+      name: ms.NAME,
+      fee: ms.FEE,
+      funcs: funcs.map(f => ({ func_id: f.FUNC_ID, func_name: f.FUNC_NAME }))
+    };
+  }));
+
+  return results;
+};
